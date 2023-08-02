@@ -2,21 +2,33 @@
 import { useState } from "react"
 
 export default function App(){
-  const [games, setGame] = useState([])
+  const [games, setGame] = useState( () =>{
+    const storedGames =localStorage.getItem("obc-game-lib")
+    if (!storedGames) return []
+    return JSON.parse( storedGames )
+  })
   const [title, setTitle] = useState("")
   const [cover, setCover] = useState("")
 
   const addGame = ({ tittle, cover }) => {
     const id = Math.floor(Math.random() * 10000000)
     const game = { id, title, cover }
-    setGame(state => [...state, game])
+      setGame(state => {
+      const newState = [...state, game]
+      localStorage.setItem("obc-game-lib", JSON.stringify(newState))
+      return newState
+      })
   }
 
   const removeGame = (id) => {
-    setGame(state => state.filter(game => game.id !== id))
+    setGame(state => {
+      const newState = state.filter(game => game.id !== id)
+      localStorage.setItem("obc-game-lib", JSON.stringify(newState))
+      return newState
+    })
+    
   }
-
-  const handleSubmit = (ev) => {
+    const handleSubmit = (ev) => {
     ev.preventDefault()
     addGame({ title, cover })
     setTitle("")
@@ -26,7 +38,7 @@ export default function App(){
 
   return (
     <div id="app">
-      <h1>Biclioteca de jogos</h1>
+      <h1>Biblioteca de jogos</h1>
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="title">Titulo:</label>
